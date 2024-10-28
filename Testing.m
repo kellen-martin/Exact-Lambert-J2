@@ -35,8 +35,11 @@ c = norm(r1 - r2);
 semi = .5*(norm(r1) + norm(r2) + c);
 
 %% Compute contour
-a_min = -100000;
-a_max = 100000;
+a_min = alpha;
+e_max = .9;
+r_p = min(norm(r1), norm(r2));
+r_a = -r_p*(e_max + 1)/(e_max - 1);
+a_max = (r_a + r_p)/2;
 Cr = (a_max - a_min)/2;
 a0 = a_min + Cr;
 
