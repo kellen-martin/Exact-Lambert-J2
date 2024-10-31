@@ -44,12 +44,12 @@ sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
     C_j = a0 + Cr*exp(pi*1i*j/N);
-    sum1 = sum1 + exp(2*pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2);
-    sum2 = sum2 + exp(pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2);
+    sum1 = sum1 + exp(2*pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2, delta_t);
+    sum2 = sum2 + exp(pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2, delta_t);
 end
 
-f_plus = f_eval(theta, mu, J_2, alpha, s, c, a0 + Cr, semi, r1, r2);
-f_minus = f_eval(theta, mu, J_2, alpha, s, c, a0 - Cr, semi, r1, r2);
+f_plus = f_eval(theta, mu, J_2, alpha, s, c, a0 + Cr, semi, r1, r2, delta_t);
+f_minus = f_eval(theta, mu, J_2, alpha, s, c, a0 - Cr, semi, r1, r2, delta_t);
 
 a = a0 + Cr*real(f_plus + f_minus + 2*sum1)/real(f_plus + f_minus + 2*sum2);
 
@@ -73,7 +73,7 @@ function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
     e = sqrt(1 - (r1*r2*sin(theta/2)^2)/(a^2*sin(psi)^2));
 end
 
-function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, delta_t)
+function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alpha, delta_t)
     % Iterative Method for the inclination and RAAN
     % Initial Guess
     h_hat = cross(r1_vec,r2_vec)/norm(cross(r1_vec,r2_vec));
@@ -109,7 +109,7 @@ function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, del
     end
 end
 
-function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2)
+function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2, delta_t)
     % find the angles
     [psi, cphi] = get_angles(semi, c, a);
     e = get_eccentricity(r1, r2, theta, psi, a);
