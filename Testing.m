@@ -78,7 +78,14 @@ function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
 
     e = sqrt(1 - (r1*r2*sin(theta/2)^2)/(a^2*sin(psi)^2));
 end
- 
+
+function [i, Omega] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, delta_t)
+    % Iterative Method for the inclination and RAAN
+
+    i = 0;
+    Omega = 0;
+end
+
 function val = f_eval(theta, mu, J2, alpha, s, c, a, semi, r1, r2)
     % find the angles
     [psi, cphi] = get_angles(semi, c, a);
