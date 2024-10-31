@@ -79,11 +79,40 @@ function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
     e = sqrt(1 - (r1*r2*sin(theta/2)^2)/(a^2*sin(psi)^2));
 end
 
-function [i, Omega] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, delta_t)
+function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, delta_t)
     % Iterative Method for the inclination and RAAN
+    % Initial Guess
+    h_hat = cross(r1_vec,r2_vec)/norm(cross(r1_vec,r2_vec));
+    i = asin(h_hat(3));
+    f = @(Omega) sin(i)*cos(Omega)*r1_vec(1) + sin(i)*sin(Omega)*r1_vec(2) + cos(i)*r1_vec(3);
+    Omega_1 = fsolve(f,0);
 
-    i = 0;
-    Omega = 0;
+    % Initialize Newton Method
+    tol = 1E-10;
+    n = 0;
+    N_max = 100;
+    F = [10; 10];
+
+    % Newton Method
+    while(norm(F)>tol && n<N_max)
+        Beta = 3/2*((J2*sqrt(mu)*alpha^2)/(a^(7/2)*(1 - e^2)^2));
+        delta_Omega = -Beta*cos(i)*delta_t;
+        Omega_2 = Omega_1 + delta_Omega;
+        ddeltaOmega_di = Beta*sin(i)*delta_t;
+
+        F = [sin(i)*cos(Omega_1)*r1_vec(1) + sin(i)*sin(Omega_1)*r1_vec(2) + cos(i)*r1_vec(3);
+            sin(i)*cos(Omega_2)*r2_vec(1) + sin(i)*sin(Omega_2)*r2_vec(2) + cos(i)*r2_vec(3)];
+
+        DF = [cos(i)*sin(Omega_1)*r1_vec(1) + cos(i)*sin(Omega_1)*r1_vec(2) - sin(i)*r1_vec(3), -sin(i)*sin(Omega_1)*r1_vec(1) + sin(i)*cos(Omega_1)*r1_vec(2);
+            (cos(i)*cos(Omega_2) - sin(i)*sin(Omega_2)*ddeltaOmega_di)*r2_vec(1) + (cos(i)*sin(Omega_2) + sin(i)*cos(Omega_2)*ddeltaOmega_di)*r2_vec(2) -sin(i)*r2_vec(3),-sin(i)*sin(Omega_2)*r2_vec(1) + sin(i)*cos(Omega_2)*r2_vec(2)];
+        
+        delta_X = DF\F;
+        i = i + delta_X(1);
+        Omega_1 = Omega_1 + delta_X(2); 
+    end
+    if(n == N_max)
+        fprintf('Did not Converge')
+    end
 end
 
 function val = f_eval(theta, mu, J2, alpha, s, c, a, semi, r1, r2)
