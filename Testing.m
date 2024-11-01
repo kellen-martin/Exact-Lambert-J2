@@ -3,8 +3,8 @@ clc;
 clear
 %% Given
 % Position vectors
-r1 = [8000, 0, 0];    % [km] 
-r2 = [-7000, 8000, 500];    % [km]
+r1 = [8000; 0; 0];    % [km] 
+r2 = [-7000; 8000; 500];    % [km]
 
 % time of flight
 delta_t = 900000;        % [s]   
@@ -37,6 +37,8 @@ a_max = (r_a + r_p)/2;
 Cr = (a_max - a_min)/2;
 a0 = a_min + Cr;
 
+%% Test Feval
+test = f_eval(theta, mu, J_2, alpha, c, a0, semi, r1, r2, delta_t);
 %% Trapaziod Rule
 
 N = 6; % [number of points]
@@ -48,8 +50,8 @@ for j=1:(N-1)
     sum2 = sum2 + exp(pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2, delta_t);
 end
 
-f_plus = f_eval(theta, mu, J_2, alpha, s, c, a0 + Cr, semi, r1, r2, delta_t);
-f_minus = f_eval(theta, mu, J_2, alpha, s, c, a0 - Cr, semi, r1, r2, delta_t);
+f_plus = f_eval(theta, mu, J_2, alpha, c, a0 + Cr, semi, r1, r2, delta_t);
+f_minus = f_eval(theta, mu, J_2, alpha, c, a0 - Cr, semi, r1, r2, delta_t);
 
 a = a0 + Cr*real(f_plus + f_minus + 2*sum1)/real(f_plus + f_minus + 2*sum2);
 
@@ -79,7 +81,8 @@ function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alp
     h_hat = cross(r1_vec,r2_vec)/norm(cross(r1_vec,r2_vec));
     i = asin(h_hat(3));
     f = @(Omega) sin(i)*cos(Omega)*r1_vec(1) + sin(i)*sin(Omega)*r1_vec(2) + cos(i)*r1_vec(3);
-    Omega_1 = fsolve(f,0);
+    % Omega_1 = fsolve(f,0);
+    Omega_1 = pi;
 
     % Initialize Newton Method
     tol = 1E-10;
@@ -98,11 +101,12 @@ function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alp
             sin(i)*cos(Omega_2)*r2_vec(1) + sin(i)*sin(Omega_2)*r2_vec(2) + cos(i)*r2_vec(3)];
 
         DF = [cos(i)*sin(Omega_1)*r1_vec(1) + cos(i)*sin(Omega_1)*r1_vec(2) - sin(i)*r1_vec(3), -sin(i)*sin(Omega_1)*r1_vec(1) + sin(i)*cos(Omega_1)*r1_vec(2);
-            (cos(i)*cos(Omega_2) - sin(i)*sin(Omega_2)*ddeltaOmega_di)*r2_vec(1) + (cos(i)*sin(Omega_2) + sin(i)*cos(Omega_2)*ddeltaOmega_di)*r2_vec(2) -sin(i)*r2_vec(3),-sin(i)*sin(Omega_2)*r2_vec(1) + sin(i)*cos(Omega_2)*r2_vec(2)];
+            (cos(i)*cos(Omega_2) - sin(i)*sin(Omega_2)*ddeltaOmega_di)*r2_vec(1) + (cos(i)*sin(Omega_2) + sin(i)*cos(Omega_2)*ddeltaOmega_di)*r2_vec(2) - sin(i)*r2_vec(3),-sin(i)*sin(Omega_2)*r2_vec(1) + sin(i)*cos(Omega_2)*r2_vec(2)];
         
         delta_X = DF\F;
         i = i + delta_X(1);
         Omega_1 = Omega_1 + delta_X(2); 
+        n = n + 1;
     end
     if(n == N_max)
         fprintf('Did not Converge')
@@ -113,7 +117,7 @@ function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2, delta_t)
     % find the angles
     [psi, cphi] = get_angles(semi, c, a);
     e = get_eccentricity(r1, r2, theta, psi, a);
-    [i,~,~] = newton_angles(r1, r2, a, e, J2, mu, delta_t);
+    [i,~,~] = newton_angles(r1, r2, a, e, J2, mu, alpha, delta_t);
     val = sqrt(mu/(a^3))/(2*(psi - sin(psi)*cphi) + (J2*((alpha/(2*a))^2)*(3*sin(i)^2 - 2))/(((1 - e^2)^3))*(4*(e^2 + 2)*psi - 16*sin(psi)*cphi + 4*sin(2*psi)*(cphi^2 - e^2/2)));
 end
 
