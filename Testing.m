@@ -3,7 +3,7 @@ clc;
 clear
 %% Given
 % Position vectors
-r1 = [8000; 0; 0];    % [km] 
+r1 = [8000; 0; 900];    % [km] 
 r2 = [-7000; 8000; 500];    % [km]
 
 % time of flight
@@ -39,6 +39,7 @@ a0 = a_min + Cr;
 
 %% Test Feval
 test = f_eval(theta, mu, J_2, alpha, c, a0, semi, r1, r2, delta_t);
+
 %% Trapaziod Rule
 
 N = 6; % [number of points]
@@ -74,20 +75,34 @@ function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
 
     e = sqrt(1 - (r1*r2*sin(theta/2)^2)/(a^2*sin(psi)^2));
 end
+function [i, Omega_1, Omega_2] = newton_angles_2(r1_vec, r2_vec, a, e, J2, mu, alpha, delta_t)
+    Beta = 3/2*((J2*sqrt(mu)*alpha^2)/(a^(7/2)*(1 - e^2)^2));
+    
+    % F = [r_1.h_hat, r2.h_hat, Omega_1 + delta_Omega - Omega_2]
+    % X = [i; Omega_1, Omega_2]
+    F = @(x) [sin(x(1))*cos(x(2))*r1_vec(1) + sin(x(1))*sin(x(2))*r1_vec(2) + cos(x(1))*r1_vec(3);
+              sin(x(1))*cos(x(3))*r2_vec(1) + sin(x(1))*sin(x(3))*r2_vec(2) + cos(x(1))*r2_vec(3);
+              x(2) - Beta*cos(x(1))*delta_t - x(3)];
+    x = fsolve(F, [.5*pi, pi, .3 + pi]);
+
+    i = x(1);
+    Omega_1 = x(2);
+    Omega_2 = x(3);
+end
 
 function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alpha, delta_t)
     % Iterative Method for the inclination and RAAN
     % Initial Guess
-    h_hat = cross(r1_vec,r2_vec)/norm(cross(r1_vec,r2_vec));
-    i = asin(h_hat(3));
+
+    i = asin(r1_vec(3)/norm(r1_vec));
     f = @(Omega) sin(i)*cos(Omega)*r1_vec(1) + sin(i)*sin(Omega)*r1_vec(2) + cos(i)*r1_vec(3);
-    % Omega_1 = fsolve(f,0);
-    Omega_1 = pi;
+    Omega_1 = fsolve(f,0);
+
 
     % Initialize Newton Method
     tol = 1E-10;
     n = 0;
-    N_max = 100;
+    N_max = 1000;
     F = [10; 10];
 
     % Newton Method
@@ -109,7 +124,7 @@ function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alp
         n = n + 1;
     end
     if(n == N_max)
-        fprintf('Did not Converge')
+        fprintf('Did not Converge \n')
     end
 end
 
@@ -117,7 +132,7 @@ function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2, delta_t)
     % find the angles
     [psi, cphi] = get_angles(semi, c, a);
     e = get_eccentricity(r1, r2, theta, psi, a);
-    [i,~,~] = newton_angles(r1, r2, a, e, J2, mu, alpha, delta_t);
+    [i,~,~] = newton_angles_2(r1, r2, a, e, J2, mu, alpha, delta_t);
     val = sqrt(mu/(a^3))/(2*(psi - sin(psi)*cphi) + (J2*((alpha/(2*a))^2)*(3*sin(i)^2 - 2))/(((1 - e^2)^3))*(4*(e^2 + 2)*psi - 16*sin(psi)*cphi + 4*sin(2*psi)*(cphi^2 - e^2/2)));
 end
 
