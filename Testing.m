@@ -7,7 +7,7 @@ r1 = [8000; 0; 900];    % [km]
 r2 = [-7000; 8000; 500];    % [km]
 
 % time of flight
-delta_t = 900000;        % [s]   
+delta_t = 90000;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -57,6 +57,25 @@ f_minus = f_eval(theta, mu, J_2, alpha, c, a0 - Cr, semi, r1, r2, delta_t);
 a = a0 + Cr*real(f_plus + f_minus + 2*sum1)/real(f_plus + f_minus + 2*sum2);
 
 %% Calculate Velocity
+% Find the Velocity Magnitutde (Vis Viva)
+v1_mag = sqrt(mu*(2/norm(r1) - 1/a));
+v2_mag = sqrt(mu*(2/norm(r2) - 1/a));
+% Find the orbital plane and time 1 and 2
+[psi, ~] = get_angles(semi,c,a);
+e = get_eccentricity(r1, r2, theta, psi, a);
+[i, Omega_1, Omega_2] = newton_angles_2(r1, r2, a, e, J_2, mu, alpha, delta_t);
+
+
+%% Test Case
+% Initial Conditions
+
+% Propegation 
+
+% Lambert Condidtions
+
+% Lambert Solve
+
+% Accuracy
 
 %% Functions
 function [psi, cphi] = get_angles(semi,c,a)
@@ -133,6 +152,6 @@ function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2, delta_t)
     [psi, cphi] = get_angles(semi, c, a);
     e = get_eccentricity(r1, r2, theta, psi, a);
     [i,~,~] = newton_angles_2(r1, r2, a, e, J2, mu, alpha, delta_t);
-    val = sqrt(mu/(a^3))/(2*(psi - sin(psi)*cphi) + (J2*((alpha/(2*a))^2)*(3*sin(i)^2 - 2))/(((1 - e^2)^3))*(4*(e^2 + 2)*psi - 16*sin(psi)*cphi + 4*sin(2*psi)*(cphi^2 - e^2/2)));
+    val = (2*(psi - sin(psi)*cphi) + (J2*((alpha/(2*a))^2)*(3*sin(i)^2 - 2))/(((1 - e^2)^3))*(4*(e^2 + 2)*psi - 16*sin(psi)*cphi + 4*sin(2*psi)*(cphi^2 - e^2/2)) - sqrt(mu/(a^3))*delta_t);
 end
 
