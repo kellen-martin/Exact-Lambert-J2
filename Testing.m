@@ -4,7 +4,7 @@ clear
 %% Given
 
 % time of flight
-delta_t = 500;        % [s]   
+delta_t = 5000;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -20,7 +20,7 @@ r1 = [7000; 0; 0];    % [km]
 
 %% Test Case
 % Initial Velocity
-v1 = [0; 7.5; 2];
+v1 = [0; 7.5; 5];
 
 % Propegation 
 %[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
@@ -35,7 +35,7 @@ v1_mag_real = norm(v1);
 v2_mag_real = norm(v2);
 
 % Inital and Final RAAN and inclination
-[a_prop, e, ~, i_prop, Omega_1_prop, ~, ~] = get_oe(r_prop(1,:), v1, mu);
+[a_prop, e_prop, ~, i_prop, Omega_1_prop, ~, ~] = get_oe(r_prop(1,:), v1, mu);
 [~, ~, ~, ~, Omega_2_prop, ~, ~] = get_oe(r_prop(end,:), v2, mu);
 
 % Plot Test Case
@@ -72,19 +72,20 @@ a0 = a_min + Cr;
 
 %% Trapaziod Rule
 
-N = 30; % [number of points]
+N = 100; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
     C_j = a0 + Cr*exp(pi*1i*j/N);
-    sum1 = sum1 + exp(2*pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2, delta_t);
-    sum2 = sum2 + exp(pi*1i*j/N)*f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2, delta_t);
+    f_cj = f_eval(theta, mu, J_2, alpha, c, C_j, semi, r1, r2, delta_t);
+    sum1 = sum1 + exp(2*pi*1i*j/N)*f_cj;
+    sum2 = sum2 + exp(pi*1i*j/N)*f_cj;
 end
 
 f_plus = f_eval(theta, mu, J_2, alpha, c, a0 + Cr, semi, r1, r2, delta_t);
 f_minus = f_eval(theta, mu, J_2, alpha, c, a0 - Cr, semi, r1, r2, delta_t);
 
-a = a0 + Cr*real(f_plus + f_minus + 2*sum1)/real(f_plus + f_minus + 2*sum2);
+a = a0 + Cr*real((f_plus + f_minus + 2*sum1)/(f_plus + f_minus + 2*sum2));
 
 %% Calculate Velocity
 % Find the Velocity Magnitutde (Vis Viva)
@@ -130,7 +131,7 @@ function [i, Omega_1, Omega_2] = newton_angles_2(r1_vec, r2_vec, a, e, J2, mu, a
     F = @(x) [sin(x(1))*cos(x(2))*r1_vec(1) + sin(x(1))*sin(x(2))*r1_vec(2) + cos(x(1))*r1_vec(3);
               sin(x(1))*cos(x(3))*r2_vec(1) + sin(x(1))*sin(x(3))*r2_vec(2) + cos(x(1))*r2_vec(3);
               x(2) - Beta*cos(x(1))*delta_t - x(3)];
-    x = fsolve(F, [.5*pi, pi, .3 + pi]);
+    x = fsolve(F, [0, 0, 0]);
 
     i = x(1);
     Omega_1 = x(2);
