@@ -1,10 +1,32 @@
 %% This Scipt is for testing the Generalized Labert's Problem 
 clc;
 clear
+%% Test Case
+% Initial Conditions
+r1 = [1000; -40; -50];    % [km] 
+v1 = [2; 7; 6];
+
+delta_t = 90000;        % [s]   
+
+ndot = 0;
+nddot = 0;
+% Propegation 
+%[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
+integrate_2bp_j2()
+
+v1_mag_real = norm(v1);
+v2_mag_real = norm(v2);
+
+% Lambert Condidtions
+
+% Lambert Solve
+
+% Accuracy
+
 %% Given
 % Position vectors
 r1 = [8000; 0; 900];    % [km] 
-r2 = [-7000; 8000; 500];    % [km]
+
 
 % time of flight
 delta_t = 90000;        % [s]   
@@ -66,16 +88,6 @@ e = get_eccentricity(r1, r2, theta, psi, a);
 [i, Omega_1, Omega_2] = newton_angles_2(r1, r2, a, e, J_2, mu, alpha, delta_t);
 
 
-%% Test Case
-% Initial Conditions
-
-% Propegation 
-
-% Lambert Condidtions
-
-% Lambert Solve
-
-% Accuracy
 
 %% Functions
 function [psi, cphi] = get_angles(semi,c,a)
