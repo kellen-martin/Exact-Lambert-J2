@@ -1,35 +1,10 @@
 %% This Scipt is for testing the Generalized Labert's Problem 
 clc;
 clear
-%% Test Case
-% Initial Conditions
-r1 = [1000; -40; -50];    % [km] 
-v1 = [2; 7; 6];
-
-delta_t = 90000;        % [s]   
-
-ndot = 0;
-nddot = 0;
-% Propegation 
-%[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
-integrate_2bp_j2()
-
-v1_mag_real = norm(v1);
-v2_mag_real = norm(v2);
-
-% Lambert Condidtions
-
-% Lambert Solve
-
-% Accuracy
-
 %% Given
-% Position vectors
-r1 = [8000; 0; 900];    % [km] 
-
 
 % time of flight
-delta_t = 90000;        % [s]   
+delta_t = 500;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -39,6 +14,41 @@ J_2 = 1.0826E-3;
 
 % Mean Equitorial Radius
 alpha = 6378;       % [km]
+
+% Position vectors
+r1 = [7000; 0; 0];    % [km] 
+
+%% Test Case
+% Initial Velocity
+v1 = [0; 7.5; 2];
+
+% Propegation 
+%[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
+[r_prop, v_prop] = integrate_2bp_j2(r1, v1, mu, delta_t);
+
+% Final State
+r2 = r_prop(end,:);
+v2 = v_prop(end,:);
+
+% Calculate Velocity Magnitudes
+v1_mag_real = norm(v1);
+v2_mag_real = norm(v2);
+
+% Inital and Final RAAN and inclination
+[a_prop, e, ~, i_prop, Omega_1_prop, ~, ~] = get_oe(r_prop(1,:), v1, mu);
+[~, ~, ~, ~, Omega_2_prop, ~, ~] = get_oe(r_prop(end,:), v2, mu);
+
+% Plot Test Case
+figure
+plot3(r_prop(:,1), r_prop(:,2), r_prop(:,3))
+hold on
+axis equal
+[x,y,z] = sphere;
+x = alpha*x;
+y = alpha*y;
+z = alpha*z;
+surf(x,y,z)
+hold off
 
 %% Compute other quantites
 % angle between r1 & r2
@@ -51,7 +61,7 @@ c = norm(r1 - r2);
 semi = .5*(norm(r1) + norm(r2) + c);
 
 %% Compute contour
-a_min = alpha;
+a_min = 1000;
 e_max = .9;
 r_p = min(norm(r1), norm(r2));
 r_a = -r_p*(e_max + 1)/(e_max - 1);
@@ -59,12 +69,10 @@ a_max = (r_a + r_p)/2;
 Cr = (a_max - a_min)/2;
 a0 = a_min + Cr;
 
-%% Test Feval
-test = f_eval(theta, mu, J_2, alpha, c, a0, semi, r1, r2, delta_t);
 
 %% Trapaziod Rule
 
-N = 6; % [number of points]
+N = 30; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
@@ -88,7 +96,15 @@ e = get_eccentricity(r1, r2, theta, psi, a);
 [i, Omega_1, Omega_2] = newton_angles_2(r1, r2, a, e, J_2, mu, alpha, delta_t);
 
 
+%% Results
 
+% Absolute Error in velocity magnitude
+v1_error = abs(v1_mag_real - v1_mag);
+v2_error = abs(v2_mag_real - v2_mag);
+
+% Absolute Error in RAAN
+Omega1_error = abs(Omega_1 - Omega_1_prop);
+Omega2_error = abs(Omega_2 - Omega_2_prop);
 %% Functions
 function [psi, cphi] = get_angles(semi,c,a)
 
