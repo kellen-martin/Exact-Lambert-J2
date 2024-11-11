@@ -16,11 +16,11 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 % Position vectors
-r1 = [7000; 0; 0];    % [km] 
+r1 = [7000; 22; 50];    % [km] 
 
 %% Test Case
 % Initial Velocity
-v1 = [0; 7.5; 5];
+v1 = [1; 7.5; 5];
 
 % Propegation 
 %[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
@@ -51,8 +51,12 @@ surf(x,y,z)
 hold off
 
 %% Test thing
-[i, Omega_1, Omega_2] = newton_angles_2(r1, r2, a_prop, e_prop, J_2, mu, alpha, delta_t)
-%% Compute other quantites
+[i, Omega1, Omega2] = newton_angles_2(r1, r2, a_prop, e_prop, J_2, mu, alpha, delta_t);
+x = [i_prop, Omega_1_prop, Omega_2_prop];
+    F =[sin(x(1))*sin(x(2))*r1(1) - sin(x(1))*cos(x(2))*r1(2) + cos(x(1))*r1(3);
+              sin(x(1))*sin(x(3))*r2(1) - sin(x(1))*cos(x(3))*r2(2) + cos(x(1))*r2(3)];
+
+ %% Compute other quantites
 % angle between r1 & r2
 theta = dot(r1, r2)/(norm(r1)*norm(r2));
 
@@ -87,7 +91,7 @@ end
 f_plus = f_eval(theta, mu, J_2, alpha, c, a0 + Cr, semi, r1, r2, delta_t);
 f_minus = f_eval(theta, mu, J_2, alpha, c, a0 - Cr, semi, r1, r2, delta_t);
 
-a = a0 + Cr*real((f_plus + f_minus + 2*sum1)/(f_plus + f_minus + 2*sum2));
+a = a0 + Cr*real((f_plus + f_minus + 2*sum1)/(f_plus - f_minus + 2*sum2));
 
 %% Calculate Velocity
 % Find the Velocity Magnitutde (Vis Viva)
@@ -130,8 +134,8 @@ function [i, Omega_1, Omega_2] = newton_angles_2(r1_vec, r2_vec, a, e, J2, mu, a
     
     % F = [r_1.h_hat, r2.h_hat, Omega_1 + delta_Omega - Omega_2]
     % X = [i; Omega_1, Omega_2]
-    F = @(x) [sin(x(1))*cos(x(2))*r1_vec(1) + sin(x(1))*sin(x(2))*r1_vec(2) + cos(x(1))*r1_vec(3);
-              sin(x(1))*cos(x(3))*r2_vec(1) + sin(x(1))*sin(x(3))*r2_vec(2) + cos(x(1))*r2_vec(3);
+    F = @(x) [sin(x(1))*sin(x(2))*r1_vec(1) - sin(x(1))*cos(x(2))*r1_vec(2) + cos(x(1))*r1_vec(3);
+              sin(x(1))*sin(x(3))*r2_vec(1) - sin(x(1))*cos(x(3))*r2_vec(2) + cos(x(1))*r2_vec(3);
               x(2) - Beta*cos(x(1))*delta_t - x(3)];
     x = fsolve(F, [.5, 0, 0]);
 
