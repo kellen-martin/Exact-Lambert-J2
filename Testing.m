@@ -50,15 +50,10 @@ z = alpha*z;
 surf(x,y,z)
 hold off
 
-%% Test thing
-[i, Omega1, Omega2] = newton_angles_2(r1, r2, a_prop, e_prop, J_2, mu, alpha, delta_t);
-x = [i_prop, Omega_1_prop, Omega_2_prop];
-    F =[sin(x(1))*sin(x(2))*r1(1) - sin(x(1))*cos(x(2))*r1(2) + cos(x(1))*r1(3);
-              sin(x(1))*sin(x(3))*r2(1) - sin(x(1))*cos(x(3))*r2(2) + cos(x(1))*r2(3)];
 
  %% Compute other quantites
 % angle between r1 & r2
-theta = dot(r1, r2)/(norm(r1)*norm(r2));
+theta = acos(dot(r1/norm(r1), r2/norm(r2)));
 
 % cord length
 c = norm(r1 - r2);
@@ -78,7 +73,7 @@ a0 = a_min + Cr;
 
 %% Trapaziod Rule
 
-N = 100; % [number of points]
+N = 6; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
