@@ -4,7 +4,7 @@ clear
 %% Given
 
 % time of flight
-delta_t = 5000;        % [s]   
+delta_t = 500;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -35,7 +35,7 @@ v1_mag_real = norm(v1);
 v2_mag_real = norm(v2);
 
 % Inital and Final RAAN and inclination
-[a_prop, e_prop, ~, i_prop, Omega_1_prop, ~, ~] = get_oe(r_prop(1,:), v1, mu);
+[a_prop, e_prop, p_prop, i_prop, Omega_1_prop, ~, ~] = get_oe(r_prop(1,:), v1, mu);
 [~, ~, ~, ~, Omega_2_prop, ~, ~] = get_oe(r_prop(end,:), v2, mu);
 
 % Plot Test Case
@@ -51,6 +51,7 @@ surf(x,y,z)
 hold off
 
 
+
  %% Compute other quantites
 % angle between r1 & r2
 theta = acos(dot(r1/norm(r1), r2/norm(r2)));
@@ -61,6 +62,11 @@ c = norm(r1 - r2);
 % semi perimeter
 semi = .5*(norm(r1) + norm(r2) + c);
 
+%% More Tests
+[psi, ~] = get_angles(semi,c,a_prop);
+p_test = 2*norm(r1)*norm(r2)*sin(theta/2)^2/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));
+% p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_prop*sin(psi)^2);
+e_test = get_eccentricity(r1, r2, theta, psi, a_prop);
 %% Compute contour
 a_min = 1000;
 e_max = .9;
@@ -73,7 +79,7 @@ a0 = a_min + Cr;
 
 %% Trapaziod Rule
 
-N = 6; % [number of points]
+N = 100; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
