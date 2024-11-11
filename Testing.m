@@ -1,10 +1,11 @@
 %% This Scipt is for testing the Generalized Labert's Problem 
 clc;
 clear
+close all
 %% Given
 
 % time of flight
-delta_t = 500;        % [s]   
+delta_t = 1000;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -16,11 +17,11 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 % Position vectors
-r1 = [7000; 22; 50];    % [km] 
+r1 = [7000; 0; 0];    % [km] 
 
 %% Test Case
 % Initial Velocity
-v1 = [1; 7.5; 5];
+v1 = [2; 2; 7.5];
 
 % Propegation 
 %[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
@@ -64,7 +65,7 @@ semi = .5*(norm(r1) + norm(r2) + c);
 
 %% More Tests
 [psi, ~] = get_angles(semi,c,a_prop);
-p_test = 2*norm(r1)*norm(r2)*sin(theta/2)^2/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));
+p_test = 2*norm(r1)*norm(r2)*(sin(theta/2)^2)/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));
 % p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_prop*sin(psi)^2);
 e_test = get_eccentricity(r1, r2, theta, psi, a_prop);
 %% Compute contour
@@ -79,7 +80,7 @@ a0 = a_min + Cr;
 
 %% Trapaziod Rule
 
-N = 100; % [number of points]
+N = 20; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
@@ -127,8 +128,12 @@ end
 function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
     r1 = norm(r1_vec);
     r2 = norm(r2_vec);
+    
+    % Calculate Orbit Parameter
+    p = 2*norm(r1)*norm(r2)*(sin(theta/2)^2)/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));;
 
-    e = sqrt(1 - (r1*r2*sin(theta/2)^2)/(a^2*sin(psi)^2));
+    % Claculate eccentricity
+    e = sqrt(1 - p/a);
 end
 function [i, Omega_1, Omega_2] = newton_angles_2(r1_vec, r2_vec, a, e, J2, mu, alpha, delta_t)
     Beta = 3/2*((J2*sqrt(mu)*alpha^2)/(a^(7/2)*(1 - e^2)^2));
