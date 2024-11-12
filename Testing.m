@@ -5,7 +5,7 @@ close all
 %% Given
 
 % time of flight
-delta_t = 1000;        % [s]   
+delta_t = 2000;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -17,11 +17,11 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 % Position vectors
-r1 = [7000; 50; 0];    % [km] 
+r1 = [7000; 500; 30];    % [km] 
 
 %% Test Case
 % Initial Velocity
-v1 = [2; 7.5; 2];
+v1 = [-1; 7.5; 2];
 
 % Kepler Solve
 [r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
@@ -37,7 +37,7 @@ v2_mag_real = norm(v2);
 
 
 
- %% Compute other quantites
+%% Compute other quantites
 % angle between r1 & r2
 theta = acos(dot(r1/norm(r1), r2/norm(r2)));
 
@@ -48,14 +48,10 @@ c = norm(r1 - r2);
 semi = .5*(norm(r1) + norm(r2) + c);
 
 %% More Tests
-[i_w, Omega_1_w, Omega_2_w] = newton_angles_2(r1, r2, 300, 20, J_2, mu, alpha, delta_t);
-
-%% other
-
 [i_test, Omega_1_test, Omega_2_test] = newton_angles_2(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
 [psi, ~] = get_angles(semi,c,a_v);
-p_test = 2*norm(r1)*norm(r2)*(sin(theta/2)^2)/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));
-p_test_2 = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi)^2);
+
+p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi)^2);
 e_test = get_eccentricity(r1, r2, theta, psi, a_v);
 
 %% Compute contour
@@ -70,7 +66,7 @@ a0 = a_min + Cr;
 
 %% Trapaziod Rule
 
-N = 30; % [number of points]
+N = 6; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
@@ -147,6 +143,6 @@ function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2, delta_t)
     [psi, cphi] = get_angles(semi, c, a);
     e = get_eccentricity(r1, r2, theta, psi, a);
     [i,~,~] = newton_angles_2(r1, r2, a, e, J2, mu, alpha, delta_t);
-    val = (2*(psi - sin(psi)*cphi) + (J2*((alpha/(2*a))^2)*(3*sin(i)^2 - 2))/(((1 - e^2)^3))*(4*(e^2 + 2)*psi - 16*sin(psi)*cphi + 4*sin(2*psi)*(cphi^2 - e^2/2)) - sqrt(mu/(a^3))*delta_t);
+    val = (2*(psi - sin(psi)*cphi) + (J2*((alpha/(2*a))^2)*(3*sin(i)^2 - 2))/(((1 - e^2)^3))*(4*(e^2 + 2)*psi - 16*sin(psi)*cphi + 8*sin(2*psi)*cphi^2 - 4*e^2*sin(2*psi)) - sqrt(mu/(a^3))*delta_t)^-1;
 end
 
