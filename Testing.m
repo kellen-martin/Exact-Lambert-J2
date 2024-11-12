@@ -17,39 +17,23 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 % Position vectors
-r1 = [7000; 0; 0];    % [km] 
+r1 = [7000; 50; 0];    % [km] 
 
 %% Test Case
 % Initial Velocity
-v1 = [2; 2; 7.5];
+v1 = [2; 7.5; 2];
 
-% Propegation 
-%[r2,v2] = pkepler(r1, v1, delta_t, ndot, nddot);
-[r_prop, v_prop] = integrate_2bp_j2(r1, v1, mu, delta_t);
+% Kepler Solve
+[r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
 
-% Final State
-r2 = r_prop(end,:);
-v2 = v_prop(end,:);
 
 % Calculate Velocity Magnitudes
 v1_mag_real = norm(v1);
 v2_mag_real = norm(v2);
 
 % Inital and Final RAAN and inclination
-[a_prop, e_prop, p_prop, i_prop, Omega_1_prop, ~, ~] = get_oe(r_prop(1,:), v1, mu);
-[~, ~, ~, ~, Omega_2_prop, ~, ~] = get_oe(r_prop(end,:), v2, mu);
-
-% Plot Test Case
-figure
-plot3(r_prop(:,1), r_prop(:,2), r_prop(:,3))
-hold on
-axis equal
-[x,y,z] = sphere;
-x = alpha*x;
-y = alpha*y;
-z = alpha*z;
-surf(x,y,z)
-hold off
+[a_v, e_v, p_v, i_v, Omega_1_v, ~, ~] = get_oe(r1, v1, mu);
+[~, ~, ~, ~, Omega_2_v, ~, ~] = get_oe(r2, v2, mu);
 
 
 
@@ -64,10 +48,16 @@ c = norm(r1 - r2);
 semi = .5*(norm(r1) + norm(r2) + c);
 
 %% More Tests
-[psi, ~] = get_angles(semi,c,a_prop);
+[i_w, Omega_1_w, Omega_2_w] = newton_angles_2(r1, r2, 300, 20, J_2, mu, alpha, delta_t);
+
+%% other
+
+[i_test, Omega_1_test, Omega_2_test] = newton_angles_2(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
+[psi, ~] = get_angles(semi,c,a_v);
 p_test = 2*norm(r1)*norm(r2)*(sin(theta/2)^2)/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));
-% p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_prop*sin(psi)^2);
-e_test = get_eccentricity(r1, r2, theta, psi, a_prop);
+p_test_2 = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi)^2);
+e_test = get_eccentricity(r1, r2, theta, psi, a_v);
+
 %% Compute contour
 a_min = 1000;
 e_max = .9;
@@ -80,7 +70,7 @@ a0 = a_min + Cr;
 
 %% Trapaziod Rule
 
-N = 20; % [number of points]
+N = 30; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
@@ -112,8 +102,9 @@ v1_error = abs(v1_mag_real - v1_mag);
 v2_error = abs(v2_mag_real - v2_mag);
 
 % Absolute Error in RAAN
-Omega1_error = abs(Omega_1 - Omega_1_prop);
-Omega2_error = abs(Omega_2 - Omega_2_prop);
+Omega1_error = abs(Omega_1 - Omega_1_v);
+Omega2_error = abs(Omega_2 - Omega_2_v);
+
 %% Functions
 function [psi, cphi] = get_angles(semi,c,a)
 
@@ -130,11 +121,12 @@ function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
     r2 = norm(r2_vec);
     
     % Calculate Orbit Parameter
-    p = 2*norm(r1)*norm(r2)*(sin(theta/2)^2)/(norm(r1) + norm(r2) - 2*sqrt(norm(r1)*norm(r2))*cos(theta/2)*cos(psi));;
+    p = norm(r1)*norm(r2)*sin(theta/2)^2/(a*sin(psi)^2);
 
     % Claculate eccentricity
     e = sqrt(1 - p/a);
 end
+
 function [i, Omega_1, Omega_2] = newton_angles_2(r1_vec, r2_vec, a, e, J2, mu, alpha, delta_t)
     Beta = 3/2*((J2*sqrt(mu)*alpha^2)/(a^(7/2)*(1 - e^2)^2));
     
@@ -142,50 +134,12 @@ function [i, Omega_1, Omega_2] = newton_angles_2(r1_vec, r2_vec, a, e, J2, mu, a
     % X = [i; Omega_1, Omega_2]
     F = @(x) [sin(x(1))*sin(x(2))*r1_vec(1) - sin(x(1))*cos(x(2))*r1_vec(2) + cos(x(1))*r1_vec(3);
               sin(x(1))*sin(x(3))*r2_vec(1) - sin(x(1))*cos(x(3))*r2_vec(2) + cos(x(1))*r2_vec(3);
-              x(2) - Beta*cos(x(1))*delta_t - x(3)];
+              x(3) + Beta*cos(x(1))*delta_t - x(2)];
     x = fsolve(F, [.5, 0, 0]);
 
     i = x(1);
     Omega_1 = x(2);
     Omega_2 = x(3);
-end
-
-function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alpha, delta_t)
-    % Iterative Method for the inclination and RAAN
-    % Initial Guess
-
-    i = asin(r1_vec(3)/norm(r1_vec));
-    f = @(Omega) sin(i)*cos(Omega)*r1_vec(1) + sin(i)*sin(Omega)*r1_vec(2) + cos(i)*r1_vec(3);
-    Omega_1 = fsolve(f,0);
-
-
-    % Initialize Newton Method
-    tol = 1E-10;
-    n = 0;
-    N_max = 1000;
-    F = [10; 10];
-
-    % Newton Method
-    while(norm(F)>tol && n<N_max)
-        Beta = 3/2*((J2*sqrt(mu)*alpha^2)/(a^(7/2)*(1 - e^2)^2));
-        delta_Omega = -Beta*cos(i)*delta_t;
-        Omega_2 = Omega_1 + delta_Omega;
-        ddeltaOmega_di = Beta*sin(i)*delta_t;
-
-        F = [sin(i)*cos(Omega_1)*r1_vec(1) + sin(i)*sin(Omega_1)*r1_vec(2) + cos(i)*r1_vec(3);
-            sin(i)*cos(Omega_2)*r2_vec(1) + sin(i)*sin(Omega_2)*r2_vec(2) + cos(i)*r2_vec(3)];
-
-        DF = [cos(i)*sin(Omega_1)*r1_vec(1) + cos(i)*sin(Omega_1)*r1_vec(2) - sin(i)*r1_vec(3), -sin(i)*sin(Omega_1)*r1_vec(1) + sin(i)*cos(Omega_1)*r1_vec(2);
-            (cos(i)*cos(Omega_2) - sin(i)*sin(Omega_2)*ddeltaOmega_di)*r2_vec(1) + (cos(i)*sin(Omega_2) + sin(i)*cos(Omega_2)*ddeltaOmega_di)*r2_vec(2) - sin(i)*r2_vec(3),-sin(i)*sin(Omega_2)*r2_vec(1) + sin(i)*cos(Omega_2)*r2_vec(2)];
-        
-        delta_X = DF\F;
-        i = i + delta_X(1);
-        Omega_1 = Omega_1 + delta_X(2); 
-        n = n + 1;
-    end
-    if(n == N_max)
-        fprintf('Did not Converge \n')
-    end
 end
 
 function val = f_eval(theta, mu, J2, alpha, c, a, semi, r1, r2, delta_t)
