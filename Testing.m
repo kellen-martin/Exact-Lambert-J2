@@ -49,24 +49,23 @@ semi = .5*(norm(r1) + norm(r2) + c);
 
 %% More Tests
 [i_test, Omega_1_test, Omega_2_test] = newton_angles_2(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
-[psi, ~] = get_angles(semi,c,a_v);
+[psi_test, c_phi_test] = get_angles(semi,c,a_v);
 
-p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi)^2);
-e_test = get_eccentricity(r1, r2, theta, psi, a_v);
+p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi_test)^2);
+e_test = get_eccentricity(r1, r2, theta, psi_test, a_v);
 
 %% Compute contour
-a_min = 1000;
-e_max = .9;
+a_min = c/2;
+e_max = .8;
 r_p = min(norm(r1), norm(r2));
 r_a = -r_p*(e_max + 1)/(e_max - 1);
 a_max = (r_a + r_p)/2;
 Cr = (a_max - a_min)/2;
 a0 = a_min + Cr;
 
-
 %% Trapaziod Rule
 
-N = 6; % [number of points]
+N = 10; % [number of points]
 sum1 = 0;
 sum2 = 0;
 for j=1:(N-1)
@@ -79,7 +78,10 @@ end
 f_plus = f_eval(theta, mu, J_2, alpha, c, a0 + Cr, semi, r1, r2, delta_t);
 f_minus = f_eval(theta, mu, J_2, alpha, c, a0 - Cr, semi, r1, r2, delta_t);
 
-a = a0 + Cr*real((f_plus + f_minus + 2*sum1)/(f_plus - f_minus + 2*sum2));
+numerator = f_plus + f_minus + 2*sum1;
+denominator = f_plus - f_minus + 2*sum2;
+
+a = a0 + Cr*real(numerator)/real(denominator);
 
 %% Calculate Velocity
 % Find the Velocity Magnitutde (Vis Viva)
