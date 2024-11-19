@@ -15,7 +15,7 @@ alpha = 6378;       % [km]
 %% Create Random Initial Conditions
 
 % Vector Direction
-v1_direction = rand(1,3);
+v1_direction = [0, rand(), rand()];
 v1_direction = v1_direction/norm(v1_direction);
 r1_direction = rand(1,3);
 r1_direction = r1_direction/norm(r1_direction);
@@ -37,19 +37,28 @@ v1 = v1_mag*v1_direction;
 
 % Random Time of Flight
 tof_min = 500;
-tof_max = 2*pi*sqrt(r_max^3/mu);
+tof_max = 5000;
 delta_t = tof_min + (tof_max - tof_min)*rand();
 
-%% Find Final Condtions
-[r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
-v2_mag = norm(v2);
+%% New Monte
+r1_direction = rand(1,3);
+r1_direction = r1_direction/norm(r1_direction);
+r2_direction = rand(1,3);
+r2_direction = r2_direction/norm(r2_direction);
 
-[a_v, e_v, p_v, i_v, Omega_1_v, ~, ~] = get_oe(r1, v1, mu);
+r_max = 10000;
+r1_mag = alpha + (r_max - alpha)*rand();
+r2_mag = alpha + (r_max - alpha)*rand();
+
+r1 = r1_direction*r1_mag;
+r2 = r2_mag*r2_direction;
+
 %% Lambert Solve
-N = 10;
-[a_L, v1_L, v2_L] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N);
+N = 100;
+%[a_L, v1_L, v2_L] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N);
+[a_o, v1_o, v2_o] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N);
 
 %% Errors
-error_a_abs = abs(a_L - a_v);
-error_v1_abs = abs(v1_L - v1_mag);
-error_v2_abs = abs(v2_L - v2_mag);
+%error_a_abs = abs(a_L - a_v);
+%error_v1_abs = abs(v1_L - v1_mag);
+%error_v2_abs = abs(v2_L - v2_mag);
