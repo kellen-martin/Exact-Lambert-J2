@@ -1,7 +1,8 @@
-function [v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, inc, theta)
-h_mag = v1_mag*norm(r1)*sin(theta);
-h_1 = h_mag*[sin(inc)*sin(Omega_1), sin(inc)*cos(Omega_1),cos(inc)];
-h_2 = h_mag*[sin(inc)*sin(Omega_2), sin(inc)*cos(Omega_2),cos(inc)];
+function [v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, inc)
+
+
+h_1 = h_mag*[sin(inc)*sin(Omega_1), -sin(inc)*cos(Omega_1),cos(inc)];
+h_2 = h_mag*[sin(inc)*sin(Omega_2), -sin(inc)*cos(Omega_2),cos(inc)];
 
 % We want to solve the system r x v = h
 F1 = @(v1) [h_1(1) - (r1(2)*v1_mag*v1(3) - r1(3)*v1_mag*v1(2));

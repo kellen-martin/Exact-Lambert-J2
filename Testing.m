@@ -53,7 +53,12 @@ p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a*sin(psi)^2);
 
 e = get_eccentricity(r1, r2, theta, psi, a_v);
 [i, Omega_1_L, Omega_2_L] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
-[v1_s, v2_s] = velocity_solve(r1, r2, v1_L, v2_L, Omega_1_L, Omega_2_L, i, theta);
+
+[v1_s, v2_s] = velocity_solve(r1, r2, v1_L, v2_L, Omega_1_L, Omega_2_L, i);
+
+h_v = norm(cross(r2,v2));
+
+h_test = sqrt(p_v*mu);
 %% Results
 % Error in semi major axis
 a_error = abs(a_v - a)/a_v;

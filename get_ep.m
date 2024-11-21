@@ -1,4 +1,4 @@
-function e = get_eccentricity(r1_vec, r2_vec, theta, psi, a)
+function [e, p] = get_ep(r1_vec, r2_vec, theta, psi, a)
     r1 = norm(r1_vec);
     r2 = norm(r2_vec);
     
