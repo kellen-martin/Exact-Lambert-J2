@@ -41,7 +41,9 @@ T = 2*pi*sqrt(a_v^3/mu);
 ratio = delta_t/T;
 
 [a, v1_L, v2_L] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, 100);
-
+[a_L, ~, ~, i_v, Omega_1_l, ~, ~] = get_oe(r1, v1_L', mu);
+[i_1, Omega_11, Omega_21] = newton_angles(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
+[i_2, Omega_12, Omega_22] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
 %% Test things
 % cord length
 c = norm(r1 - r2);
@@ -54,11 +56,6 @@ p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a*sin(psi)^2);
 e = get_eccentricity(r1, r2, theta, psi, a_v);
 [i, Omega_1_L, Omega_2_L] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
 
-[v1_s, v2_s] = velocity_solve(r1, r2, v1_L, v2_L, Omega_1_L, Omega_2_L, i);
-
-h_v = norm(cross(r2,v2));
-
-h_test = sqrt(p_v*mu);
 %% Results
 % Error in semi major axis
 a_error = abs(a_v - a)/a_v;

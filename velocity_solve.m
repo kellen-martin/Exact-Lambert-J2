@@ -1,6 +1,5 @@
-function [v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, inc)
-
-
+function [v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, inc, p, mu)
+h_mag = sqrt(p*mu);
 h_1 = h_mag*[sin(inc)*sin(Omega_1), -sin(inc)*cos(Omega_1),cos(inc)];
 h_2 = h_mag*[sin(inc)*sin(Omega_2), -sin(inc)*cos(Omega_2),cos(inc)];
 
