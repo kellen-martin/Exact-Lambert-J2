@@ -5,7 +5,7 @@ close all
 %% Given
 
 % time of flight
-delta_t = 300;        % [s]   
+delta_t = 3000;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -21,7 +21,7 @@ r1 = [7000; 50; 300];    % [km]
 
 %% Test Case
 % Initial Velocity
-v1 = [1; 8; 2];
+v1 = [3; 8; 2];
 
 % Kepler Solve
 [r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
@@ -56,6 +56,8 @@ p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a*sin(psi)^2);
 e = get_eccentricity(r1, r2, theta, psi, a_v);
 [i, Omega_1_L, Omega_2_L] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
 
+h_v = cross(r2,v2)/norm(cross(r2,v2));
+h_test = [sin(i)*sin(Omega_2_L), -sin(i)*cos(Omega_2_L),cos(i)];
 %% Results
 % Error in semi major axis
 a_error = abs(a_v - a)/a_v;
