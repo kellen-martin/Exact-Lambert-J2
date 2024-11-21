@@ -5,7 +5,7 @@ close all
 %% Given
 
 % time of flight
-delta_t = 3000;        % [s]   
+delta_t = 300;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -21,7 +21,7 @@ r1 = [7000; 50; 300];    % [km]
 
 %% Test Case
 % Initial Velocity
-v1 = [1; -8; -2];
+v1 = [1; 8; 2];
 
 % Kepler Solve
 [r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
@@ -41,9 +41,9 @@ T = 2*pi*sqrt(a_v^3/mu);
 ratio = delta_t/T;
 
 [a, v1_L, v2_L] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, 100);
-[a_L, ~, ~, i_v, Omega_1_l, ~, ~] = get_oe(r1, v1_L', mu);
+[a_L, ~, ~, i_v, Omega_1_l, ~, ~] = get_oe(r1, v1_L, mu);
 [i_1, Omega_11, Omega_21] = newton_angles(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
-[i_2, Omega_12, Omega_22] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
+[i_2, Omega_12, Omega_22] = newton_angles(r1, r2, a, e_v, J_2, mu, alpha, delta_t);
 %% Test things
 % cord length
 c = norm(r1 - r2);
@@ -59,9 +59,10 @@ e = get_eccentricity(r1, r2, theta, psi, a_v);
 %% Results
 % Error in semi major axis
 a_error = abs(a_v - a)/a_v;
+
 % Error in velocity magnitude
-v1_error = abs(v1_mag_real - v1_L);
-v2_error = abs(v2_mag_real - v2_L);
+v1_error = v1 - v1_L;
+v2_error = v2 - v2_L;
 
 
 

@@ -12,6 +12,6 @@ F2 = @(v2) [h_2(1) - (r2(2)*v2_mag*v2(3) - r2(3)*v2_mag*v2(2));
             h_2(2) + (r2(1)*v2_mag*v2(3) - r2(3)*v2_mag*v2(1));
             h_2(3) - (r2(1)*v2_mag*v2(2) - r2(2)*v2_mag*v2(1))];
 
-v1 = v1_mag*fsolve(F1, [0, 0, 0]);
-v2 = v2_mag*fsolve(F2, [0, 0, 0]);
+v1 = v1_mag*fsolve(F1, [0; 0; 0]);
+v2 = v2_mag*fsolve(F2, [0; 0; 0]);
 end
