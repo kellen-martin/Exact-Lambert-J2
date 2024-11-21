@@ -5,7 +5,7 @@ h_2 = h_mag*[sin(inc)*sin(Omega_2), -sin(inc)*cos(Omega_2), cos(inc)];
 
 % We want to solve the system r x v = h
 F1 = @(v1) [h_1(1) - (r1(2)*v1_mag*v1(3) - r1(3)*v1_mag*v1(2));
-            h_1(2) - (r1(1)*v1_mag*v1(3) - r1(3)*v1_mag*v1(1));
+            h_1(2) - (r1(3)*v1_mag*v1(1) - r1(1)*v1_mag*v1(3));
             h_1(3) - (r1(1)*v1_mag*v1(2) - r1(2)*v1_mag*v1(1))];
 
 F2 = @(v2) [h_2(1) - (r2(2)*v2_mag*v2(3) - r2(3)*v2_mag*v2(2));
