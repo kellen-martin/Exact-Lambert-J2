@@ -5,7 +5,7 @@ close all
 %% Given
 
 % time of flight
-delta_t = 3000;        % [s]   
+delta_t = 7000;        % [s]   
 
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -17,11 +17,12 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 % Position vectors
-r1 = [7000; 50; 300];    % [km] 
+r1 = [7000; 500; 50];    % [km] 
 
 %% Test Case
 % Initial Velocity
-v1 = [3; 8; 2];
+v1 = [7.5; .7; -4];
+
 
 % Kepler Solve
 [r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
