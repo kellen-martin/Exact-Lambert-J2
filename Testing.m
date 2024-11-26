@@ -21,7 +21,7 @@ r1 = [7000; 500; 50];    % [km]
 
 %% Test Case
 % Initial Velocity
-v1 = [7.5; .7; -4];
+v1 = [3; 8; -4];
 
 
 % Kepler Solve

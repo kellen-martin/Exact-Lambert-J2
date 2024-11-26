@@ -21,11 +21,23 @@ alpha = 6378;       % [km]
 T = 2*pi*sqrt((a_v^3)/mu);
 ratio = delta_t/T;
 
+%% Test Things
+theta = 2*pi - acos(dot(r1/norm(r1), r2/norm(r2)));
+% cord length
+c = norm(r1 - r2);
+% semi-perimeter
+semi = .5*(norm(r1) + norm(r2) + c);
+[psi, cphi] = lagrange_angles(semi,c,a_v);
+e_test = get_eccentricity(r1, r2, theta, psi, a_v);
+p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi)^2);
+
 %% Lambert Solve
 N = 100;
-[a_o, ~, ~] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N);
+[a, v1_mag, v2_mag] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N);
 
 %% Errors
-%error_a_abs = abs(a_L - a_v);
-%error_v1_abs = abs(v1_L - v1_mag);
-%error_v2_abs = abs(v2_L - v2_mag);
+v1_mag_real = norm(v1);
+v2_mag_real = norm(v2);
+error_v1_mag = abs(v1_mag - v1_mag_real)/v1_mag_real;
+error_v2_mag = abs(v2_mag - v2_mag_real)/v2_mag_real;
+error_a_rel = abs(a - a_v)/a_v;

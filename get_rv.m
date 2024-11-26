@@ -16,6 +16,6 @@ rdot_p = sqrt(mu/p)*[-sind(f), e+cosd(f), 0]';
 % Rotate to ECI 
 C_np = angle2dcm(Omega, i, omega, 'ZXZ'); % DCM from N to P 
 C_pn = transpose(C_np);                % DCM from P to N
-r = mtimes(C_pn, r_p)';
-rdot = mtimes(C_pn, rdot_p)';
+r = mtimes(C_pn, r_p);
+rdot = mtimes(C_pn, rdot_p);
 end
