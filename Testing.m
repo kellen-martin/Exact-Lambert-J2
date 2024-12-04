@@ -46,6 +46,8 @@ ratio = delta_t/T;
 [i_1, Omega_11, Omega_21] = newton_angles(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
 [i_2, Omega_12, Omega_22] = newton_angles(r1, r2, a, e_v, J_2, mu, alpha, delta_t);
 %% Test things
+[~, ~, ~, i_t, Omega_1_t, ~, ~] = get_oe(r1, v1_L, mu);
+[~, ~, ~, i_t_2, Omega_2_t, ~, ~] = get_oe(r1, v1_L, mu);
 % cord length
 c = norm(r1 - r2);
 % semi-perimeter

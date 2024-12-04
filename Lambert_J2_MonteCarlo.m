@@ -13,18 +13,18 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 %% Monte Carlo
-N = [4 6 8 16 32 64];
-a_error_mean = zeros(1, length(N));
-v1_error_mean = zeros(1, length(N));
-v2_error_mean = zeros(1, length(N));
-solve_time_mean = zeros(1, length(N));
-
-for j=1:length(N)
-error_v1_rel = zeros(1,1000);
-error_v2_rel = zeros(1,1000);
-error_a_rel = zeros(1,1000);
-solve_time = zeros(1,1000);
-delta_t = zeros(1,1000);
+% N = [4 6 8 16 32 64];
+% a_error_mean = zeros(1, length(N));
+% v1_error_mean = zeros(1, length(N));
+% v2_error_mean = zeros(1, length(N));
+% solve_time_mean = zeros(1, length(N));
+% 
+% for j=1:length(N)
+% error_v1_rel = zeros(1,1000);
+% error_v2_rel = zeros(1,1000);
+% error_a_rel = zeros(1,1000);
+% solve_time = zeros(1,1000);
+% delta_t = zeros(1,1000);
 
     for i=1:100
     % Create Random Initial Conditions
@@ -54,7 +54,7 @@ a_error_mean(j) = mean(error_a_rel);
 v1_error_mean(j) = mean(error_v1_rel);
 v2_error_mean(j) = mean(error_v2_rel);
 solve_time_mean(j) = mean(solve_time);
-end
+% end
 %% Plots
 run_time_analysis = table(N', solve_time_mean', a_error_mean');
 

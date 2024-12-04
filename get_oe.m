@@ -1,8 +1,8 @@
 function [a, e, p, i, Omega, omega, f] = get_oe(r, rdot, mu)
 % ECI unit vectors
-k_hat = [0 0 1];
-i_hat = [1 0 0];
-j_hat = [0 1 0];
+k_hat = [0; 0; 1];
+i_hat = [1; 0; 0];
+j_hat = [0; 1; 0];
 
 % Angular momentum
 h = cross(r, rdot);

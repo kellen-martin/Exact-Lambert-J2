@@ -1,5 +1,5 @@
 %% J2 Perturbed Lambert Solver
-function [a, v1_mag, v2_mag] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N)
+function [a, v1, v2] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N)
 
 %% Compute Geometric Quantities
 % angle between position vectors
@@ -14,12 +14,13 @@ semi = .5*(norm(r1) + norm(r2) + c);
 %% Compute Contour
 a_min_1 = c/2;
 e_max = .8;
-r_lim = min(norm(r1), norm(r2));
-r_a = -r_lim*(e_max + 1)/(e_max - 1);
-a_max = (r_a + r_lim)/2;
+r_min = min(norm(r1), norm(r2));
+r_a = -r_min*(e_max + 1)/(e_max - 1);
+a_max = (r_a + r_min)/2;
 
-r_p = -r_lim*(e_max - 1)/(e_max + 1);
-a_min_2 = (r_lim + r_p)/2;
+r_max = max(norm(r1), norm(r2));
+r_p = -r_max*(e_max - 1)/(e_max + 1);
+a_min_2 = (r_max + r_p)/2;
 a_min = max(a_min_1, a_min_2);
 Cr = (a_max - a_min)/2;
 a0 = a_min + Cr;
@@ -47,11 +48,11 @@ a = a0 + Cr*real(numerator)/real(denominator);
 v1_mag = sqrt(mu*(2/norm(r1) - 1/a));
 v2_mag = sqrt(mu*(2/norm(r2) - 1/a));
 
-% % Find the orbital plane and time 1 and 2
-% [psi, ~] = lagrange_angles(semi,c,a);
-% e = get_eccentricity(r1, r2, theta, psi, a);
-% p = get_parameter(r1, r2, theta, psi, a);
-% [i, Omega_1, Omega_2] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
-% 
-% [v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, i, p, mu);
+% Find the orbital plane and time 1 and 2
+[psi, ~] = lagrange_angles(semi,c,a);
+e = get_eccentricity(r1, r2, theta, psi, a);
+p = get_parameter(r1, r2, theta, psi, a);
+[i, Omega_1, Omega_2] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
+
+[v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, i, p, mu);
 end
