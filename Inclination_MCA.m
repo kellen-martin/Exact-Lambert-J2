@@ -62,11 +62,13 @@ a_error_mean_1newt = mean(error_a_rel_1newt);
 v1_error_mean_1newt = mean(error_v1_rel_1newt);
 v2_error_mean_1newt = mean(error_v2_rel_1newt);
 solve_time_mean_1newt = mean(solve_time_1newt);
+std_a_error_1newt = std(error_a_rel_1newt);
 
 a_error_mean = mean(error_a_rel);
 v1_error_mean = mean(error_v1_rel);
 v2_error_mean = mean(error_v2_rel);
 solve_time_mean = mean(solve_time);
+std_a_error = std(error_a_rel);
 
 %% Compare Results
 a_error_diff = a_error_mean - a_error_mean_1newt;
