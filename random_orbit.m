@@ -2,7 +2,7 @@ function [oes, delta_t] = random_orbit(mu)
 % Creates a random orbit, bounds are given in the function, may change this
 % later
 
-a_min = 6000;
+a_min = 6400;
 a_max = 11000;
 a = a_min + (a_max - a_min)*rand;
 
