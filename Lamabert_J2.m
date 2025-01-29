@@ -3,8 +3,13 @@ function [a, v1, v2] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N)
 
 %% Compute Geometric Quantities
 % angle between position vectors
-theta = acos(dot(r1/norm(r1), r2/norm(r2)));
 
+theta = acos(dot(r1/norm(r1), r2/norm(r2)));
+check = cross(r1, r2);
+
+if(check(3)<0)
+    theta = 2*pi-theta;
+end
 % cord length
 c = norm(r1 - r2);
 
