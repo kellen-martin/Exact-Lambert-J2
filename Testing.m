@@ -2,11 +2,8 @@
 clc;
 clear
 close all
-%% Given
 
-% time of flight
-delta_t = 3000;        % [s]   
-
+%% System Variables
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
 
@@ -16,62 +13,61 @@ J_2 = 1.0826E-3;
 % Mean Equitorial Radius
 alpha = 6378;       % [km]
 
-% Position vectors
-r1 = [7000; 500; 50];    % [km] 
+% Time step
+t_step = 1;        % [s]
 
-%% Test Case
-% Initial Velocity
-v1 = [3; 8; -4];
+%% Generate random orbit 
+[oes, delta_t] = random_orbit(mu);
+a = oes(1);
+e = oes(2);
+i = oes(3);
+omega = oes(4);
+Omega = oes(5);
+f = oes(6);
+M = atan2(-sqrt(1 - e^2)*sin(f), -e - cos(f)) + pi - e*(sqrt(1 - e^2)*sin(f))/(1 + e*cos(f));
+data_oes = [a e i omega Omega M];
 
+%% Write datos.problema
+folder_path = 'C:\Users\kmartin6\Desktop\ppkbj21-Kellen\ppkbj21-Kellen';
+cd(folder_path);
 
-% Kepler Solve
-[r2,v2] = pkepler(r1, v1, delta_t, 0, 0);
+fileID_data = fopen('datos.problema', 'w');
 
+fprintf(fileID_data, 'O\n\n');
+fprintf(fileID_data, '%.16g ', data_oes);    % Orbital Elements [a e i omega Omega M]
+fprintf(fileID_data, '\n\n');
+fprintf(fileID_data, '0.0\n\n');             % Initial Time
+fprintf(fileID_data, '%.16g', delta_t);      % Final Time
+fprintf(fileID_data, '\n\n');
+fprintf(fileID_data, '%.16g', t_step);       % Time step
+fprintf(fileID_data, '\n\n');
+fprintf(fileID_data, '%.16g', mu);           % Gravitational Parameter
+fprintf(fileID_data, '\n\n');
+fprintf(fileID_data, '%.16g', alpha);        % Earth Mean Radius
+fprintf(fileID_data, '\n\n');
+fprintf(fileID_data, '0.0\n\n'); 
+fprintf(fileID_data, '%.16g', J_2);          % Earth J_2 constant
 
-theta = acos(dot(r1/norm(r1), r2/norm(r2)));
+%% Compile and Execute ppkb
+files = dir(fullfile(folder_path,'*.c'));
+files_list = strjoin(fullfile(folder_path, {files.name}, ''));
+compile_cmd = ['gcc ' files_list ' -O3 -std=c89 -lm -o ppkb'];
 
-% Calculate Velocity Magnitudes
-v1_mag_real = norm(v1);
-v2_mag_real = norm(v2);
+comp = system(compile_cmd);
+exe = system('ppkb.exe');
 
-% Inital and Final RAAN and inclination
-[a_v, e_v, p_v, i_v, Omega_1_v, ~, ~] = get_oe(r1, v1, mu);
-[~, ~, ~, ~, Omega_2_v, ~, ~] = get_oe(r2, v2, mu);
-[p,a_p,ecc,incl,omega,argp,nu,m,arglat,truelon,lonper ] = rv2coe (r1,v1,mu);
-T = 2*pi*sqrt(a_v^3/mu);
-ratio = delta_t/T;
+%% Read first and last entry of solcart.out
+fileID_oe_out = fopen('solorb.out','r');
+fileID_cart_out = fopen('solcart.out','r');
 
-[a, v1_L, v2_L] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, 100);
-[a_L, ~, ~, i_v, Omega_1_l, ~, ~] = get_oe(r1, v1_L, mu);
-[i_1, Omega_11, Omega_21] = newton_angles(r1, r2, a_v, e_v, J_2, mu, alpha, delta_t);
-[i_2, Omega_12, Omega_22] = newton_angles(r1, r2, a, e_v, J_2, mu, alpha, delta_t);
-%% Test things
-[~, ~, ~, i_t, Omega_1_t, ~, ~] = get_oe(r1, v1_L, mu);
-[~, ~, ~, i_t_2, Omega_2_t, ~, ~] = get_oe(r1, v1_L, mu);
-% cord length
-c = norm(r1 - r2);
-% semi-perimeter
-semi = .5*(norm(r1) + norm(r2) + c);
-[psi, cphi] = lagrange_angles(semi,c,a_v);
-e_test = get_eccentricity(r1, r2, theta, psi, a_v);
-p_test = norm(r1)*norm(r2)*sin(theta/2)^2/(a_v*sin(psi)^2);
+oe_out = fscanf(fileID_oe_out, '%f %f %f %f %f %f %f \n', [7 Inf]);
+cart_out = fscanf(fileID_cart_out, '%f %f %f %f %f %f %f \n', [7 Inf]);
 
-e = get_eccentricity(r1, r2, theta, psi, a_v);
-[i, Omega_1_L, Omega_2_L] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
-
-h_v1 = norm(cross(r1,v1));
-h_v2 = norm(cross(r2,v2));
-
-h_test = sqrt(p_test*mu);
-%% Results
-% Error in semi major axis
-a_error = abs(a_v - a)/a_v;
-
-% Error in velocity magnitude
-v1_error = v1 - v1_L;
-v2_error = v2 - v2_L;
-
-
+r1 = cart_out(2:4,1);
+r2 = cart_out(2:4,end);
+v1 = cart_out(5:7,1);
+v2 = cart_out(5:7,end);
+%% 
 
 
 
