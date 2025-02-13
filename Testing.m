@@ -17,56 +17,21 @@ alpha = 6378;       % [km]
 t_step = 1;        % [s]
 
 %% Generate random orbit 
-[oes, delta_t] = random_orbit(mu);
-a = oes(1);
-e = oes(2);
-i = oes(3);
-omega = oes(4);
-Omega = oes(5);
-f = oes(6);
-M = atan2(-sqrt(1 - e^2)*sin(f), -e - cos(f)) + pi - e*(sqrt(1 - e^2)*sin(f))/(1 + e*cos(f));
-data_oes = [a e i omega Omega M];
+N = 64;
+% [r1, v1, r2, v2, delta_t, a_L] = lambert_conditions(mu);
+r1 = [5.759301829612105e+03;-5.824374577812693e+03;1.959376242451960e+03];
+r2 = [7.267147194508008e+03;1.016451790376569e+04;-3.552235887329285e+03];
+v1 = [6.663921814079755;2.872583327035716;-1.036325223281615];
+v2 = [-3.945046393547707;2.099552425014366;-0.689536423412820];
+delta_t = 3.959601521502576e+03;
+[a, v1_L, v2_L] = Lamabert_J2_1newt(r1, r2, delta_t, mu, J_2, alpha, N);
 
-%% Write datos.problema
-folder_path = 'C:\Users\kmartin6\Desktop\ppkbj21-Kellen\ppkbj21-Kellen';
-cd(folder_path);
 
-fileID_data = fopen('datos.problema', 'w');
+[r2_sim,v2_sim] = pkepler(r1, v1_L, delta_t, 0, 0);
 
-fprintf(fileID_data, 'O\n\n');
-fprintf(fileID_data, '%.16g ', data_oes);    % Orbital Elements [a e i omega Omega M]
-fprintf(fileID_data, '\n\n');
-fprintf(fileID_data, '0.0\n\n');             % Initial Time
-fprintf(fileID_data, '%.16g', delta_t);      % Final Time
-fprintf(fileID_data, '\n\n');
-fprintf(fileID_data, '%.16g', t_step);       % Time step
-fprintf(fileID_data, '\n\n');
-fprintf(fileID_data, '%.16g', mu);           % Gravitational Parameter
-fprintf(fileID_data, '\n\n');
-fprintf(fileID_data, '%.16g', alpha);        % Earth Mean Radius
-fprintf(fileID_data, '\n\n');
-fprintf(fileID_data, '0.0\n\n'); 
-fprintf(fileID_data, '%.16g', J_2);          % Earth J_2 constant
+error = norm(r2 - r2_sim)/norm(r2);
 
-%% Compile and Execute ppkb
-files = dir(fullfile(folder_path,'*.c'));
-files_list = strjoin(fullfile(folder_path, {files.name}, ''));
-compile_cmd = ['gcc ' files_list ' -O3 -std=c89 -lm -o ppkb'];
 
-comp = system(compile_cmd);
-exe = system('ppkb.exe');
-
-%% Read first and last entry of solcart.out
-fileID_oe_out = fopen('solorb.out','r');
-fileID_cart_out = fopen('solcart.out','r');
-
-oe_out = fscanf(fileID_oe_out, '%f %f %f %f %f %f %f \n', [7 Inf]);
-cart_out = fscanf(fileID_cart_out, '%f %f %f %f %f %f %f \n', [7 Inf]);
-
-r1 = cart_out(2:4,1);
-r2 = cart_out(2:4,end);
-v1 = cart_out(5:7,1);
-v2 = cart_out(5:7,end);
 %% 
 
 
