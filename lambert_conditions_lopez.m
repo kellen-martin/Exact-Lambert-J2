@@ -1,4 +1,4 @@
-function [r1, v1, r2, v2, delta_t] = lambert_conditions_lopez()
+function [r1, v1, r2, v2, delta_t, a_out] = lambert_conditions_lopez()
 %% System Variables
 % Gravitational parameter
 mu = 3.986*10^5;    % [km^3/s^2]
@@ -23,7 +23,7 @@ Omega = oes(5);
 % Compute Mean anomaly from true anomaly
 f = oes(6);
 M = atan2(-sqrt(1 - e^2)*sin(f), -e - cos(f)) + pi - e*(sqrt(1 - e^2)*sin(f))/(1 + e*cos(f));
-data_oes = [a e i omega Omega M];
+data_oes = [a e omega Omega i M];
 
 %% Write datos.problema
 folder_path = 'C:\Users\kmartin6\Desktop\ppkbj21-Kellen\ppkbj21-Kellen';
@@ -33,7 +33,7 @@ cd(folder_path);
 fileID_data = fopen('datos.problema', 'w');
 
 fprintf(fileID_data, 'O\n\n');
-fprintf(fileID_data, '%.16g ', data_oes);    % Orbital Elements [a e i omega Omega M]
+fprintf(fileID_data, '%.16g ', data_oes);    % Orbital Elements [a e omega Omega i M]
 fprintf(fileID_data, '\n\n');
 fprintf(fileID_data, '0.0\n\n');             % Initial Time
 fprintf(fileID_data, '%.16g', delta_t);      % Final Time
@@ -46,6 +46,7 @@ fprintf(fileID_data, '%.16g', alpha);        % Earth Mean Radius
 fprintf(fileID_data, '\n\n');
 fprintf(fileID_data, '0.0\n\n'); 
 fprintf(fileID_data, '%.16g', J_2);          % Earth J_2 constant
+
 
 %% Compile and Execute ppkb
 files = dir(fullfile(folder_path,'*.c'));
@@ -61,12 +62,14 @@ fileID_cart_out = fopen('solcart.out','r');
 
 oe_out = fscanf(fileID_oe_out, '%f %f %f %f %f %f %f \n', [7 Inf]);
 cart_out = fscanf(fileID_cart_out, '%f %f %f %f %f %f %f \n', [7 Inf]);
-
+a_out = mean(oe_out(2,:));
 r1 = cart_out(2:4,1);
 r2 = cart_out(2:4,end);
 v1 = cart_out(5:7,1);
 v2 = cart_out(5:7,end);
 
+% Close all files
+fclose("all");
 
 % return to original folder
 cd(return_path)
