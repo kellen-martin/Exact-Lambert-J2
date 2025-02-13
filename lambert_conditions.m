@@ -1,4 +1,4 @@
-function [r1, v1, r2, v2, delta_t] = lambert_conditions(mu)
+function [r1, v1, r2, v2, delta_t, oes] = lambert_conditions(mu)
 
 % Random Initial Contitiobns
 [oes, delta_t] = random_orbit(mu);
