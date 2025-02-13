@@ -9,9 +9,9 @@ f = oe(6);
 p = a*(1 - e^2);
 
 % Perifocal Frame 
-rmag_p = p/(1+e*cosd(f));
-r_p = [rmag_p*cosd(f), rmag_p*sind(f), 0]';
-rdot_p = sqrt(mu/p)*[-sind(f), e+cosd(f), 0]';
+rmag_p = p/(1+e*cos(f));
+r_p = [rmag_p*cos(f), rmag_p*sin(f), 0]';
+rdot_p = sqrt(mu/p)*[-sin(f), e+cos(f), 0]';
 
 % Rotate to ECI 
 C_np = angle2dcm(Omega, i, omega, 'ZXZ'); % DCM from N to P 
