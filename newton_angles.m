@@ -9,17 +9,17 @@ function [i, Omega_1, Omega_2] = newton_angles(r1_vec, r2_vec, a, e, J2, mu, alp
     options = optimset('Display','off');
     options.MaxFunEvals=100000;
     options.MaxIter = 100000;
+    options.TolFun = 1e-10;
     x = fsolve(F, [pi/4, 0, 0], options);
-
-    r_cross_r = cross(r1_vec, r2_vec)/norm(cross(r1_vec, r2_vec));
 
     i = x(1);
     Omega_1 = x(2);
     Omega_2 = x(3);
 
-    h = [sin(x(1))*sin(x(2)), -sin(x(1))*cos(x(2)), cos(x(1))];
+    h = [sin(i)*sin(Omega_1), -sin(i)*cos(Omega_1), cos(i)];
+    if (h(3) < 0)
+        i = pi + i;
 
-    if (r_cross_r(3)*h(3) < 0)
-        i = i + pi;
     end
+
 end

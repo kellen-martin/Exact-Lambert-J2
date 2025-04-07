@@ -13,8 +13,8 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 %% Monte Carlo
-N = 500;
-trials = 100;
+N = 64;
+trials = 100000;
 error_v1_rel = zeros(1,trials);
 error_v2_rel = zeros(1,trials);
 error_a_rel = zeros(1,trials);
@@ -24,9 +24,9 @@ h = waitbar(0, 'Running');
     for i=1:trials
     % Create Random Initial Conditions
     
-    [r1, v1, r2, v2, delta_t(i), a_L] = lambert_conditions_lopez();
-    [a2(i), e2(i), p2(i), i2(i), Omega2(i), omega2(i), f2(i)] = get_oe(r2, v2, mu);
-    
+    % [r1, v1, r2, v2, delta_t(i), a_L] = lambert_conditions_lopez();
+    [r1, v1, r2, v2, delta_t(i), oes] = lambert_conditions(mu);
+    a_L = oes(1);
     % Lambert Solve
     [a, v1_L, v2_L] = Lamabert_J2_1newt(r1, r2, delta_t(i), mu, J_2, alpha, N);
 
@@ -49,15 +49,15 @@ v2_error_std = std(error_v2_rel);
 %% Plots
 
 % Error Plots
-% figure
-% histogram(error_a_rel, 100)
-% hold on
-% xline(a_error_mean, '--r', 'LineWidth',1.5)
-% xlim ([0, max(error_a_rel)]);
-% title('Relative Error in Semi-major Axis')
-% xlabel('Relative Error')
-% ylabel('Number of Trials')
-% legend('Relative Errors', 'Mean')
+figure
+histogram(error_a_rel, 100)
+hold on
+xline(a_error_mean, '--r', 'LineWidth',1.5)
+xlim ([0, max(error_a_rel)]);
+title('Relative Error in Semi-major Axis')
+xlabel('Relative Error')
+ylabel('Number of Trials')
+legend('Relative Errors', 'Mean')
 
 figure
 histogram(error_v1_rel, 100)

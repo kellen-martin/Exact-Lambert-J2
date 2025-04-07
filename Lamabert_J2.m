@@ -5,11 +5,7 @@ function [a, v1, v2] = Lamabert_J2(r1, r2, delta_t, mu, J_2, alpha, N)
 % angle between position vectors
 
 theta = acos(dot(r1/norm(r1), r2/norm(r2)));
-check = cross(r1, r2);
 
-if(check(3)<0)
-    theta = 2*pi-theta;
-end
 % cord length
 c = norm(r1 - r2);
 
@@ -17,7 +13,7 @@ c = norm(r1 - r2);
 semi = .5*(norm(r1) + norm(r2) + c);
 
 %% Compute Contour
-a_min_1 = c/2;
+a_min_1 = semi/2;
 e_max = .8;
 r_min = min(norm(r1), norm(r2));
 r_a = -r_min*(e_max + 1)/(e_max - 1);

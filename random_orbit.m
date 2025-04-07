@@ -16,7 +16,7 @@ omega = pi*rand;
 
 Omega = pi*rand;
 
-f = pi*rand;
+f = 2*pi*rand;
 
 oes = [a, e, i, omega, Omega, f];
 
