@@ -13,11 +13,11 @@ J_2 = 1.0826E-3;
 alpha = 6378;       % [km]
 
 %% Monte Carlo
-N = 64;
-trials = 100000;
-error_v1_rel = zeros(1,trials);
-error_v2_rel = zeros(1,trials);
-error_a_rel = zeros(1,trials);
+N = 256;
+trials = 10000;
+error_v1_relw = zeros(1,trials);
+error_v2_relw = zeros(1,trials);
+error_a_relw = zeros(1,trials);
 delta_t = zeros(1,trials);
 oes = zeros(6,trials);
 h = waitbar(0, 'Running');
@@ -31,11 +31,15 @@ h = waitbar(0, 'Running');
     [a, v1_L, v2_L] = Lamabert_J2_1newt(r1, r2, delta_t(i), mu, J_2, alpha, N);
 
     % Errors
-    error_a_rel(i) = abs(a_L - a)/a_L;
-    error_v1_rel(i) = norm(v1_L - v1)/norm(v1);
-    error_v2_rel(i) = norm(v2_L - v2)/norm(v2);
+    error_a_relw(i) = abs(a_L - a)/a_L;
+    error_v1_relw(i) = norm(v1_L - v1)/norm(v1);
+    error_v2_relw(i) = norm(v2_L - v2)/norm(v2);
     waitbar(i/trials, h)
     end
+
+error_a_rel = rmoutliers(error_a_relw);
+error_v1_rel = rmoutliers(error_v1_relw);
+error_v2_rel = rmoutliers(error_v2_relw);
 
 % Mean Error
 a_error_mean = mean(error_a_rel);

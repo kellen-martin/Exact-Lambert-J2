@@ -50,10 +50,10 @@ v1_mag = sqrt(mu*(2/norm(r1) - 1/a));
 v2_mag = sqrt(mu*(2/norm(r2) - 1/a));
 
 % Find the orbital plane and time 1 and 2
-[psi, ~] = lagrange_angles(semi,c,a);
+[psi, ~] = lagrange_angles_v(semi,c,a, theta);
 e = get_eccentricity(r1, r2, theta, psi, a);
 p = get_parameter(r1, r2, theta, psi, a);
 [i, Omega_1, Omega_2] = newton_angles(r1, r2, a, e, J_2, mu, alpha, delta_t);
 
-[v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, Omega_1, Omega_2, i, p, mu);
+[v1, v2] = velocity_solve(r1, r2, v1_mag, v2_mag, theta, Omega_1, Omega_2, i, p, e, mu);
 end

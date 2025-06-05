@@ -26,7 +26,7 @@ alpha = 6378;       % [km]
     ratio = delta_t/T;
     
     % Lambert Solve
-    N = 15;
+    N = 256;
     [a, v1_L, v2_L] = Lamabert_J2_1newt(r1, r2, delta_t, mu, J_2, alpha, N);
     error = norm(v1_L - v1)/norm(v1);
 
@@ -36,12 +36,12 @@ alpha = 6378;       % [km]
  h2_v = cross(r2,v2)/norm(cross(r2,v2));
 
  h1_L =[sin(i_1)*sin(Omega_11); -sin(i_1)*cos(Omega_11); cos(i_1)];
- test = cross(r1,r2)/norm(cross(r1,r2));
-    
+ h1_Lv = cross(r1,v1_L)/norm(cross(r1,v1_L));
+
+
  % Plot
  figure
  plot3([0 h1_v(1)], [0 h1_v(2)], [0, h1_v(3)], 'r-')
  hold on
- plot3([0 h2_v(1)], [0 h2_v(2)], [0, h2_v(3)], 'y-')
- plot3([0 test(1)], [0 test(2)], [0, test(3)], 'g--')
  plot3([0 h1_L(1)], [0 h1_L(2)], [0, h1_L(3)], 'b--')
+ plot3([0 h1_Lv(1)], [0 h1_Lv(2)], [0, h1_Lv(3)], 'g-')
