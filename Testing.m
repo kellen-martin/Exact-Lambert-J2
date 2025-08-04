@@ -19,8 +19,8 @@ t_step = 1;        % [s]
 
 %% Generate random orbit 
 check = true;
-n = 0;
-N = 256;
+n = 1;
+N = 16;
 
 while check
 [r1, v1, r2, v2, delta_t, a_L] = lambert_conditions(mu);
@@ -60,11 +60,27 @@ h1_hat = cross(r1, v1)/norm(cross(r1, v1));
 
 gamma1 = acos(dot(r1, v1)/(norm(r1)*norm(v1)));
 gamma2 = acos(dot(r2, v2)/(norm(r2)*norm(v2)));
-if error_v2_rel > .02
+
+% Propegate
+[r2_check, ~] = pkepler(r1, v1_L, delta_t, 0, 0);
+abs_err = norm(r2_check - r2);
+rel_err = abs_err/norm(r2);
+if rel_err > .02
     check = false;
 end
-n = n+1
+n = n+1;
 end
 
 [a, v1_L, v2_L] = Lamabert_J2_1newt(r1, r2, delta_t, mu, J_2, alpha, N);
 [at, et, pt, it, Omegat, omegat, ft] = get_oe(r1, v1_L, mu);
+
+t_vec = linspace(0, delta_t, 100);
+for i = 1:length(t_vec)
+    [orb(:,i), ~] = pkepler(r1, v1, t_vec(i), 0, 0);
+    [orb_sol(:,i), ~] = pkepler(r1, v1_L, t_vec(i), 0, 0);
+end
+
+figure
+plot3(orb(1,:), orb(2,:), orb(3,:))
+hold on
+plot3(orb_sol(1,:), orb_sol(2,:), orb_sol(3,:))

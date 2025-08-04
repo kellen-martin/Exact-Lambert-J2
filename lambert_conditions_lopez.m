@@ -14,6 +14,7 @@ t_step = 1;        % [s]
 
 %% Random Initial Contitions
 [oes, delta_t] = random_orbit(mu);
+delta_t = round(delta_t);
 a = oes(1);
 e = oes(2);
 i = oes(3);
