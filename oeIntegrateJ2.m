@@ -12,7 +12,7 @@ f0 = oe_0(6);
 h0 = sqrt(mu*a0*(1 - e0^2));
 
 State0 = [h0; e0; f0; Omega0; i0; omega0];
-options = odeset('RelTol',1e-12,'AbsTol',1e-12);
+options = odeset('RelTol',1e-13,'AbsTol',1e-13);
 tspan = [0 delta_t];
 
 [t, State] = ode45(@(t, State) ode_func(State), tspan, State0, options);

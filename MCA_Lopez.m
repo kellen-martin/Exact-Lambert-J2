@@ -16,12 +16,15 @@ alpha = 6378;       % [km]
 N = 256;
 
 %% MCA
-trials = 10;
+trials = 1;
 a_error = zeros(1, trials);
 abs_error = zeros(1, trials);
 rel_error = zeros(1, trials);
-h = waitbar(0, 'Running');
-tic
+%h = waitbar(0, 'Running');
+% boxFolder = 'C:\Users\kmartin6\Box\';
+% saveFile = fullfile(boxFolder, 'lopez_results.mat');
+% cleanupObj = onCleanup(@() save(saveFile));
+
 for i=1:trials
     % Random condition
     [r1, v1, r2, v2, delta_t, a_L] = lambert_conditions_lopez();
@@ -35,18 +38,19 @@ for i=1:trials
     [r2_check, ~, ~] = lopezPropegate(r1, v1, delta_t);
     abs_error(i) = norm(r2_check - r2);
     rel_error(i) = abs_error(i)/norm(r2);
-    waitbar(i/trials, h)
+   % waitbar(i/trials, h)
 end
-ten = toc;
-est_time = ten/ten*50000;
-close(h)
+
+
+%save(saveFile, 'abs_error', 'rel_error');
+%close(h)
 %% Post Process Data
 abs_error_mean = mean(abs_error);
 mu_a = std(abs_error);
 rel_err_mean = mean(rel_error);
 mu_r = std(rel_error);
 
-rel_error = rmoutliers(rel_error);
+%rel_error = rmoutliers(rel_error);
 figure
 histogram(rel_error, 100, 'Normalization','probability')
 hold on
@@ -55,7 +59,7 @@ hold off
 title('Relative Error Distribution')
 xlabel('Relative Error')
 
-abs_error = rmoutliers(abs_error);
+%abs_error = rmoutliers(abs_error);
 figure
 histogram(abs_error, 100, 'Normalization','probability')
 hold on
