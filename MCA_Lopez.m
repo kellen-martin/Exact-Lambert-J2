@@ -16,7 +16,7 @@ alpha = 6378;       % [km]
 N = 256;
 
 %% MCA
-trials = 1;
+trials = 3;
 a_error = zeros(1, trials);
 abs_error = zeros(1, trials);
 rel_error = zeros(1, trials);
@@ -35,7 +35,7 @@ for i=1:trials
 
     % Get Errors
     a_error(i) = (abs(a_test - a)/a_test);
-    [r2_check, ~, ~] = lopezPropegate(r1, v1, delta_t);
+    [r2_check, ~, ~] = lopezPropegate(r1, v1_L, delta_t);
     abs_error(i) = norm(r2_check - r2);
     rel_error(i) = abs_error(i)/norm(r2);
    % waitbar(i/trials, h)

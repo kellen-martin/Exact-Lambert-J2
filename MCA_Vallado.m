@@ -16,14 +16,14 @@ alpha = 6378;       % [km]
 N = 256;
 
 %% MCA
-trials = 50000;
+trials = 500;
 a_error = zeros(1, trials);
 abs_error = zeros(1, trials);
 rel_error = zeros(1, trials);
 h = waitbar(0, 'Running');
 for i=1:trials
     % Random condition
-    [r1, v1, r2, v2, delta_t, a_L] = lambert_conditions_lopez();
+    [r1, v1, r2, v2, delta_t, a_L] = lambert_conditions(mu);
     [a_test, e, p, inc, Omega1, ~, f1] = get_oe(r1, v1, mu);
     
     % Solve
