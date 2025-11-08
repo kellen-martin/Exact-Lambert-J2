@@ -16,7 +16,7 @@ alpha = 6378;       % [km]
 N = 256;
 
 %% MCA
-trials = 3;
+trials = 10;
 a_error = zeros(1, trials);
 abs_error = zeros(1, trials);
 rel_error = zeros(1, trials);

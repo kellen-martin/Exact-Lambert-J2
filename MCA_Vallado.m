@@ -16,7 +16,7 @@ alpha = 6378;       % [km]
 N = 256;
 
 %% MCA
-trials = 500;
+trials = 100000;
 a_error = zeros(1, trials);
 abs_error = zeros(1, trials);
 rel_error = zeros(1, trials);
@@ -27,7 +27,7 @@ for i=1:trials
     [a_test, e, p, inc, Omega1, ~, f1] = get_oe(r1, v1, mu);
     
     % Solve
-    [a, v1_L, v2_L] = Lamabert_J2_1newt(r1, r2, delta_t, mu, J_2, alpha, N);
+    [a, v1_L, v2_L] = Lambert_J2_1newt_2(r1, r2, delta_t, mu, J_2, alpha, N);
 
     % Get Errors
     a_error(i) = (abs(a_test - a)/a_test);

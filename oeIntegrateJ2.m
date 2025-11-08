@@ -1,4 +1,4 @@
-function oes = oeIntegrateJ2(oe_0, delta_t)
+function [oes, t] = oeIntegrateJ2(oe_0, delta_t)
 mu = 3.986*10^5;    % [km^3/s^2]
 
 a0 = oe_0(1);

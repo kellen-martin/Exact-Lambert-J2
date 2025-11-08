@@ -1,5 +1,5 @@
 %% J2 Perturbed Lambert Solver
-function [a, v1, v2] = Lamabert_J2_1newt(r1, r2, delta_t, mu, J_2, alpha, N)
+function [a, v1, v2] = Lambert_J2_1newt_2(r1, r2, delta_t, mu, J_2, alpha, N)
 
 %% Compute Geometric Quantities
 % angle between position vectors
@@ -39,6 +39,7 @@ n = 0;
 
 %% Compute Inclination
 % Find the Inclination for a = a0
+for k=1:2
 [psi, ~] = lagrange_angles(semi, c, a0, theta, ap_cross);
 e = get_eccentricity(r1, r2, theta, psi, a0);
 [i, ~, ~] = newton_angles(r1, r2, a0,e,J_2,mu,alpha,delta_t);
@@ -61,6 +62,13 @@ denominator = f_plus - f_minus + 2*sum2;
 
 a = a0 + Cr*real(numerator)/real(denominator);
 
+a0 = a;
+delta = 30;
+a_min = max(a0 - delta, a_min);
+a_max = a0 + delta;
+Cr = (a_max - a_min)/2;
+a0 = a_min + Cr;
+end
 %% Calculate Velocity
 % Find the Velocity Magnitutde (Vis Viva)
 v1_mag = sqrt(mu*(2/norm(r1) - 1/a));
